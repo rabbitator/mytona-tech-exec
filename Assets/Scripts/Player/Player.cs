@@ -9,8 +9,8 @@ public class Player : MonoBehaviour
     public float Health = 3;
     public float MaxHealth = 3;
 
-    public event Action<PlayerWeapon.WeaponType> OnWeaponChange = null;
-    public event Action<float, float> OnHPChange = null;
+    public event EventHandler<PlayerWeapon.WeaponType> OnWeaponChange;
+    public event EventHandler<(float, float)> OnHPChange;
 
     private void Awake()
     {
@@ -42,7 +42,7 @@ public class Player : MonoBehaviour
             EventBus.Pub(EventBus.PLAYER_DEATH);
         }
 
-        OnHPChange?.Invoke(Health, -amount);
+        OnHPChange?.Invoke(this, (Health, -amount));
     }
 
     public void Heal(float amount)
@@ -55,7 +55,7 @@ public class Player : MonoBehaviour
             Health = MaxHealth;
         }
 
-        OnHPChange?.Invoke(Health, amount);
+        OnHPChange?.Invoke(this, (Health, amount));
     }
 
 
@@ -65,11 +65,11 @@ public class Player : MonoBehaviour
         Health += hp;
         MaxHealth += hp;
         MoveSpeed += ms;
-        OnHPChange?.Invoke(Health, 0);
+        OnHPChange?.Invoke(this, (Health, 0));
     }
 
     public void ChangeWeapon(PlayerWeapon.WeaponType type)
     {
-        OnWeaponChange?.Invoke(type);
+        OnWeaponChange?.Invoke(this, type);
     }
 }

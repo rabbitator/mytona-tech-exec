@@ -61,7 +61,7 @@ public class PowerupSpawner : MonoBehaviour
         Spawn(PickRandomPosition());
     }
 
-    private void PlayerWeaponChangeHandler(PlayerWeapon.WeaponType type)
+    private void PlayerWeaponChangeHandler(object _, PlayerWeapon.WeaponType type)
     {
         _currentWeapon = type;
     }
@@ -79,10 +79,8 @@ public class PowerupSpawner : MonoBehaviour
 
     private void Spawn(Vector3 position)
     {
-        var weightIndex = GetRandomIndexRespectWeights();
-
         GameObject pickedPrefab;
-        do pickedPrefab = WeightIndexToPrefab(weightIndex);
+        do pickedPrefab = WeightIndexToPrefab(GetRandomIndexRespectWeights());
         while (PrefabIsWeapon(pickedPrefab, _currentWeapon));
 
         Instantiate(pickedPrefab, position, Quaternion.identity);
