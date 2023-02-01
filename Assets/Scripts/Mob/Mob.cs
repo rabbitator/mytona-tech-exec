@@ -8,21 +8,26 @@ public class Mob : MonoBehaviour
     public float MoveSpeed = 3.5f;
     public float Health = 3;
     public float MaxHealth = 3;
-    
-    public Action<float, float> OnHPChange = null;
+
+    private event EventHandler<(float, float)> _onHPChange;
+    public event EventHandler<(float, float)> OnHPChange
+    {
+        add => _onHPChange += value;
+        remove => _onHPChange -= value;
+    }
 
     public void TakeDamage(float amount)
     {
         if (Health <= 0)
             return;
         Health -= amount;
-        OnHPChange?.Invoke(Health,-amount);
+        _onHPChange?.Invoke(this, (Health, -amount));
         if (Health <= 0)
         {
             Death();
         }
     }
-    
+
     public void Heal(float amount)
     {
         if (Health <= 0)
@@ -32,7 +37,8 @@ public class Mob : MonoBehaviour
         {
             Health = MaxHealth;
         }
-        OnHPChange?.Invoke(Health,amount);
+
+        _onHPChange?.Invoke(this, (Health, amount));
     }
 
     public void Death()
@@ -43,6 +49,7 @@ public class Mob : MonoBehaviour
         {
             component.OnDeath();
         }
+
         GetComponent<Collider>().enabled = false;
         GetComponent<Rigidbody>().isKinematic = true;
     }

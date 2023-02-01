@@ -53,7 +53,11 @@ public class PowerupSpawner : MonoBehaviour
     private void OnDestroy()
     {
         EventBus.Unsub(MobKilledHandler, EventBus.MOB_KILLED);
-        Player.Instance.OnWeaponChange -= PlayerWeaponChangeHandler;
+
+        if (Player.Instance != null)
+        {
+            Player.Instance.OnWeaponChange -= PlayerWeaponChangeHandler;
+        }
     }
 
     private void MobKilledHandler()
