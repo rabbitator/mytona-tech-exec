@@ -1,16 +1,16 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using UnityEngine;
 
 public class Field : Handler<FieldCreateMessage>
 {
-    public int Size = 12;
+    [SerializeField]
+    private int _size = 12;
+
     public override void HandleMessage(FieldCreateMessage message)
     {
         var childCount = transform.childCount;
-        for (int i = 0; i < childCount; i++)
+        for (var i = 0; i < childCount; i++)
         {
-            transform.GetChild(i).gameObject.SetActive(message.Field[i/Size, i% Size]);
+            transform.GetChild(i).gameObject.SetActive(message.Field[i / _size, i % _size]);
         }
     }
 }

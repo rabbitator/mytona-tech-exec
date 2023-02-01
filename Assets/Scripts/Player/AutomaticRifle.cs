@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class AutomaticRifle : PlayerWeapon
 {
-	public override int Type => PlayerWeapon.AutomaticRifle;
+	public override WeaponType Type => WeaponType.AutomaticRifle;
 	public Projectile BulletPrefab;
 	public float Reload = 1f;
 	public Transform FirePoint;

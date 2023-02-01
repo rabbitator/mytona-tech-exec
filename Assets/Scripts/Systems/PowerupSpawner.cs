@@ -1,98 +1,171 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
-//Bad class
 public class PowerupSpawner : MonoBehaviour
 {
-	[Range(0, 100)] public float HealthUpgradeWeight = 10;
-	[Range(0, 100)] public float DamageUpgradeWeight = 10;
-	[Range(0, 100)] public float MoveSpeedUpgradeWeight = 5;
-	[Range(0, 100)] public float HealWeight = 25;
-	[Range(0, 100)] public float WeaponChangeWeight = 2;
-	[Range(0, 100)] public float RifleWeight = 25;
-	[Range(0, 100)] public float AutomaticRifleWeight = 15;
-	[Range(0, 100)] public float ShotgunWeight = 20;
+    [Header("Weights")]
+    [SerializeField, Range(0, 100)]
+    private float _healthUpgradeWeight = 10;
+    [SerializeField, Range(0, 100)]
+    private float _damageUpgradeWeight = 10;
+    [SerializeField, Range(0, 100)]
+    private float _moveSpeedUpgradeWeight = 5;
+    [SerializeField, Range(0, 100)]
+    private float _healWeight = 25;
+    [SerializeField, Range(0, 100)]
+    private float _weaponChangeWeight = 2;
+    [SerializeField, Range(0, 100)]
+    private float _rifleWeight = 25;
+    [SerializeField, Range(0, 100)]
+    private float _automaticRifleWeight = 15;
+    [SerializeField, Range(0, 100)]
+    private float _shotgunWeight = 20;
 
-	public PowerUp HealthPrefab;
-	public PowerUp DamagePrefab;
-	public PowerUp MoveSpeedPrefab;
-	public HealthPack HealPrefab;
-	public WeaponPowerUp RiflePrefab;
-	public WeaponPowerUp AutomaticRifleWPrefab;
-	public WeaponPowerUp ShotgunPrefab;
+    [Space, Header("Prefabs")]
+    [SerializeField]
+    private PowerUp _healthPrefab;
+    [SerializeField]
+    private PowerUp _damagePrefab;
+    [SerializeField]
+    private PowerUp _moveSpeedPrefab;
+    [SerializeField]
+    private HealthPack _healPrefab;
+    [SerializeField]
+    private WeaponPowerUp _riflePrefab;
+    [SerializeField]
+    private WeaponPowerUp _automaticRifleWPrefab;
+    [SerializeField]
+    private WeaponPowerUp _shotgunPrefab;
 
-	private float[] weights;
-	private float[] weaponWeights;
-    
-	private GameObject[] prefabs;
-	private WeaponPowerUp[] weaponPrefabs;
-    
-	private void Awake()
-	{
-		weights = new float[5];
-		weights[0] = HealthUpgradeWeight;
-		weights[1] = weights[0] + DamageUpgradeWeight;
-		weights[2] = weights[1] + MoveSpeedUpgradeWeight;
-		weights[3] = weights[2] + HealWeight;
-		weights[4] = weights[3] + WeaponChangeWeight;
-        
-		weaponWeights = new float[3];
-		weaponWeights[0] = RifleWeight;
-		weaponWeights[1] = weaponWeights[0] + AutomaticRifleWeight;
-		weaponWeights[2] = weaponWeights[1] + ShotgunWeight;
+    private PlayerWeapon.WeaponType _currentWeapon;
 
-		prefabs = new[]
-		{
-			HealthPrefab.gameObject, 
-			DamagePrefab.gameObject, 
-			MoveSpeedPrefab.gameObject, 
-			HealPrefab.gameObject
-		};
-		weaponPrefabs = new[]
-		{
-			RiflePrefab,
-			AutomaticRifleWPrefab,
-			ShotgunPrefab
-		};
-        
-		EventBus.Sub(Handle, EventBus.MOB_KILLED);
-	}
+    private const float FieldSideLength = 12.0f;
 
-	private void Handle()
-	{
-		Spawn(PickRandomPosition());
-	}
-	
-	private Vector3 PickRandomPosition()
-	{
-		var vector3 = new Vector3();
-		vector3.x = Random.value * 11 - 6;
-		vector3.z = Random.value * 11 - 6;
-		return vector3;
-	}
+    private void Awake()
+    {
+        EventBus.Sub(MobKilledHandler, EventBus.MOB_KILLED);
+        Player.Instance.OnWeaponChange += PlayerWeaponChangeHandler;
+    }
 
+    private void OnDestroy()
+    {
+        EventBus.Unsub(MobKilledHandler, EventBus.MOB_KILLED);
+        Player.Instance.OnWeaponChange -= PlayerWeaponChangeHandler;
+    }
 
-	private void Spawn(Vector3 position)
-	{
-		var rand = Random.value * weights[4];
-		int i = 0;
-		while (i< 5 && weights[i] >= rand)
-		{
-			i++;
-		}
+    private void MobKilledHandler()
+    {
+        Spawn(PickRandomPosition());
+    }
 
-		if (i < 4)
-		{
-			Instantiate(prefabs[Mathf.Min(3,i)], position, Quaternion.identity);
-		}
-		else
-		{
-			rand = Random.value * weaponWeights[2];
-			i = 0;
-			while (i < 3 && weaponWeights[Mathf.Min(2,i)] >= rand )
-			{
-				i++;
-			}
-			Instantiate(weaponPrefabs[Mathf.Min(2,i)], position, Quaternion.identity);
-		}
-	}
+    private void PlayerWeaponChangeHandler(PlayerWeapon.WeaponType type)
+    {
+        _currentWeapon = type;
+    }
+
+    private Vector3 PickRandomPosition()
+    {
+        var position = new Vector3
+        {
+            x = FieldSideLength * (Random.value - 0.5f),
+            z = FieldSideLength * (Random.value - 0.5f)
+        };
+
+        return position;
+    }
+
+    private void Spawn(Vector3 position)
+    {
+        var weightIndex = GetRandomIndexRespectWeights();
+
+        GameObject pickedPrefab;
+        do pickedPrefab = WeightIndexToPrefab(weightIndex);
+        while (PrefabIsWeapon(pickedPrefab, _currentWeapon));
+
+        Instantiate(pickedPrefab, position, Quaternion.identity);
+    }
+
+    private int GetRandomIndexRespectWeights()
+    {
+        var allWeights = new[]
+        {
+            _healthUpgradeWeight,
+            _damageUpgradeWeight,
+            _moveSpeedUpgradeWeight,
+            _healWeight,
+            _weaponChangeWeight,
+            _rifleWeight,
+            _automaticRifleWeight,
+            _shotgunWeight
+        };
+
+        var ranges = new List<float>(new float[allWeights.Length]);
+
+        var sum = allWeights.Sum();
+        ranges[0] = allWeights[0] / sum;
+        for (var i = 1; i < ranges.Count; i++)
+        {
+            ranges[i] = ranges[i - 1] + allWeights[i] / sum;
+        }
+
+        var random = Random.value;
+        var weightIndex = -1;
+
+        for (var i = 0; i < ranges.Count; i++)
+        {
+            if (random > ranges[i]) continue;
+
+            weightIndex = i;
+            break;
+        }
+
+        return weightIndex;
+    }
+
+    private GameObject WeightIndexToPrefab(int weightIndex)
+    {
+        return weightIndex switch
+        {
+            0 => _healthPrefab.gameObject,
+            1 => _damagePrefab.gameObject,
+            2 => _moveSpeedPrefab.gameObject,
+            3 => _healPrefab.gameObject,
+            // Not sure what this for
+            4 => GetRandomWeapon(),
+            5 => GetWeaponPrefab(PlayerWeapon.WeaponType.Rifle),
+            6 => GetWeaponPrefab(PlayerWeapon.WeaponType.AutomaticRifle),
+            7 => GetWeaponPrefab(PlayerWeapon.WeaponType.Shotgun),
+            _ => throw new ArgumentException($"Cannot map {weightIndex} weight index!")
+        };
+    }
+
+    private GameObject GetWeaponPrefab(PlayerWeapon.WeaponType type)
+    {
+        return type switch
+        {
+            PlayerWeapon.WeaponType.Rifle => _riflePrefab.gameObject,
+            PlayerWeapon.WeaponType.Shotgun => _automaticRifleWPrefab.gameObject,
+            PlayerWeapon.WeaponType.AutomaticRifle => _shotgunPrefab.gameObject,
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
+    }
+
+    private bool PrefabIsWeapon(GameObject prefab, PlayerWeapon.WeaponType type)
+    {
+        return type switch
+        {
+            PlayerWeapon.WeaponType.Rifle => prefab.Equals(_riflePrefab.gameObject),
+            PlayerWeapon.WeaponType.Shotgun => prefab.Equals(_shotgunPrefab.gameObject),
+            PlayerWeapon.WeaponType.AutomaticRifle => prefab.Equals(_automaticRifleWPrefab.gameObject),
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
+    }
+
+    private GameObject GetRandomWeapon()
+    {
+        return GetWeaponPrefab((PlayerWeapon.WeaponType)Random.Range(0, 3));
+    }
 }

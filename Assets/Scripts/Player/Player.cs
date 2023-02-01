@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -11,9 +9,8 @@ public class Player : MonoBehaviour
     public float Health = 3;
     public float MaxHealth = 3;
 
-    public Action<int> OnWeaponChange = null;
-    public Action<float, float> OnHPChange = null;
-    public Action OnUpgrade = null;
+    public event Action<PlayerWeapon.WeaponType> OnWeaponChange = null;
+    public event Action<float, float> OnHPChange = null;
 
     private void Awake()
     {
@@ -34,7 +31,7 @@ public class Player : MonoBehaviour
             Instance = null;
         }
     }
-    
+
     public void TakeDamage(float amount)
     {
         if (Health <= 0)
@@ -44,9 +41,10 @@ public class Player : MonoBehaviour
         {
             EventBus.Pub(EventBus.PLAYER_DEATH);
         }
+
         OnHPChange?.Invoke(Health, -amount);
     }
-    
+
     public void Heal(float amount)
     {
         if (Health <= 0)
@@ -56,6 +54,7 @@ public class Player : MonoBehaviour
         {
             Health = MaxHealth;
         }
+
         OnHPChange?.Invoke(Health, amount);
     }
 
@@ -66,11 +65,10 @@ public class Player : MonoBehaviour
         Health += hp;
         MaxHealth += hp;
         MoveSpeed += ms;
-        OnUpgrade?.Invoke();
         OnHPChange?.Invoke(Health, 0);
     }
 
-    public void ChangeWeapon(int type)
+    public void ChangeWeapon(PlayerWeapon.WeaponType type)
     {
         OnWeaponChange?.Invoke(type);
     }

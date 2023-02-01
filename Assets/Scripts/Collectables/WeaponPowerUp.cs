@@ -2,14 +2,13 @@
 
 public class WeaponPowerUp : MonoBehaviour
 {
-	public int Type;
+    public PlayerWeapon.WeaponType Type;
 
-	private void OnTriggerEnter(Collider other)
-	{
-		if (other.CompareTag("Player"))
-		{
-			other.GetComponent<Player>().ChangeWeapon(Type);
-			Destroy(gameObject);
-		}
-	}
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!other.CompareTag("Player")) return;
+
+        other.GetComponent<Player>().ChangeWeapon(Type);
+        Destroy(gameObject);
+    }
 }

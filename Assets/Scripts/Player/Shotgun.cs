@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Shotgun : PlayerWeapon
 {
-	public override int Type => PlayerWeapon.Shotgun;
+	public override WeaponType Type => WeaponType.Shotgun;
 	public Projectile BulletPrefab;
 	public float Reload = 1f;
 	public Transform FirePoint;

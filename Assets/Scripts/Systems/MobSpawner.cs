@@ -9,7 +9,7 @@ public class MobSpawner : Handler<SpawnMobMessage>
 	protected override void Awake()
 	{
 		base.Awake();
-		EventBus.Sub(() => { EventBus<SpawnMobMessage>.Unsub(HandleMessage);},EventBus.PLAYER_DEATH);
+		EventBus.Sub(() => EventBus<SpawnMobMessage>.Unsub(HandleMessage), EventBus.PLAYER_DEATH);
 	}
 
 	public override void HandleMessage(SpawnMobMessage message)
