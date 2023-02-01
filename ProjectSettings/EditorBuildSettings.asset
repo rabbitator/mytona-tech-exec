@@ -6,9 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/MainMenu.unity
+    path: Assets/MyTonaTechExec/Scenes/MainMenu.unity
     guid: c7c50a47162953c4c8328f9cad438162
   - enabled: 1
-    path: Assets/Scenes/Gameplay.unity
+    path: Assets/MyTonaTechExec/Scenes/Gameplay.unity
     guid: d4a6d68b7af93cd489ced4b99e3d2511
   m_configObjects: {}
