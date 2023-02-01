@@ -42,8 +42,6 @@ public class PowerupSpawner : MonoBehaviour
 
     private PlayerWeapon.WeaponType _currentWeapon;
 
-    private const float FieldSideLength = 12.0f;
-
     private void Awake()
     {
         EventBus.Sub(MobKilledHandler, EventBus.MOB_KILLED);
@@ -74,8 +72,8 @@ public class PowerupSpawner : MonoBehaviour
     {
         var position = new Vector3
         {
-            x = FieldSideLength * (Random.value - 0.5f),
-            z = FieldSideLength * (Random.value - 0.5f)
+            x = LevelData.FieldSize * (Random.value - 0.5f),
+            z = LevelData.FieldSize * (Random.value - 0.5f)
         };
 
         return position;

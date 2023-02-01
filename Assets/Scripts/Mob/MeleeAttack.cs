@@ -9,7 +9,6 @@ public class MeleeAttack : MonoBehaviour, IMobComponent
 {
 	public float AttackDistance = 1f;
 	public float DamageDistance = 1f;
-
 	public float AttackDelay = 1f;
     
 	private MobMover mover;

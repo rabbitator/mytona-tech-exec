@@ -12,7 +12,7 @@ public class HealthBar : MonoBehaviour, IMobComponent
     {
         var mob = GetComponent<Mob>();
         maxHP = mob.MaxHealth;
-        mob.OnHPChange += OnHPChange;
+        mob.OnHpChange += OnHPChange;
     }
 
     public void OnDeath()
