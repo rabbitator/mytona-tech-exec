@@ -23,11 +23,6 @@ namespace MyTonaTechExec.UI
             Bar.SetActive(false);
         }
 
-        private void LateUpdate()
-        {
-            Bar.transform.rotation = Camera.main.transform.rotation;
-        }
-
         private void OnHPChange(object _, (float health, float diff) args)
         {
             var (health, _) = args;

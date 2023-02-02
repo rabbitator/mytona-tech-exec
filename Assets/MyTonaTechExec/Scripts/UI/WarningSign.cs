@@ -1,31 +1,27 @@
+using System;
+using MyTonaTechExec.MobUnit;
 using UnityEngine;
 
-namespace MyTonaTechExec.MobUnit
+namespace MyTonaTechExec.UI
 {
     [RequireComponent(typeof(Animator))]
     public class WarningSign : MonoBehaviour
     {
-        private IAttack _mobAttack;
+        [SerializeField]
+        private MobAttack _mobAttack;
+        
         private Animator _animator;
-        private Camera _camera;
 
         private readonly int _animatorHashActivate = Animator.StringToHash("Active");
 
         private void Awake()
         {
             _animator = GetComponent<Animator>();
-            _mobAttack = GetComponentInParent<IAttack>();
-            _camera = Camera.main;
 
             _mobAttack.OnAttack += MobAttackHandler;
         }
 
-        private void Update()
-        {
-            transform.rotation = _camera.transform.rotation;
-        }
-
-        private void MobAttackHandler()
+        private void MobAttackHandler(object sender, EventArgs eventArgs)
         {
             _animator.SetTrigger(_animatorHashActivate);
         }

@@ -13,7 +13,6 @@ namespace MyTonaTechExec.MobUnit
         public float MaxHealth = 3;
 
         private event EventHandler<(float, float)> _onHpChange;
-
         public event EventHandler<(float, float)> OnHpChange
         {
             add => _onHpChange += value;

@@ -9,7 +9,6 @@ namespace MyTonaTechExec.UI
         public GameObject Bar;
         public SpriteRenderer BarImg;
         public TMP_Text Text;
-        public TMP_Text DamageText;
         private float maxHP;
         private Player player;
 
@@ -42,11 +41,6 @@ namespace MyTonaTechExec.UI
             {
                 Bar.SetActive(false);
             }
-        }
-
-        private void OnUpgrade()
-        {
-            DamageText.text = $"{player.Damage}";
         }
     }
 }
