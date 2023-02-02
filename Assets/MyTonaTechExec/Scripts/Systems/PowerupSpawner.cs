@@ -29,6 +29,8 @@ namespace MyTonaTechExec.Systems
         private float _automaticRifleWeight = 15;
         [SerializeField, Range(0, 100)]
         private float _shotgunWeight = 20;
+        [SerializeField, Range(0, 100)]
+        private float _rocketLauncherWeight = 10;
 
         [Space, Header("Prefabs")]
         [SerializeField]
@@ -45,6 +47,8 @@ namespace MyTonaTechExec.Systems
         private WeaponPowerUp _automaticRifleWPrefab;
         [SerializeField]
         private WeaponPowerUp _shotgunPrefab;
+        [SerializeField]
+        private WeaponPowerUp _rocketLauncherPrefab;
 
         private PlayerWeapon.WeaponType _currentWeapon;
 
@@ -88,8 +92,14 @@ namespace MyTonaTechExec.Systems
         private void Spawn(Vector3 position)
         {
             GameObject pickedPrefab;
-            do pickedPrefab = WeightIndexToPrefab(GetRandomIndexRespectWeights());
-            while (PrefabIsWeapon(pickedPrefab, _currentWeapon));
+            // Prevent from case when player has weapon with 100% spawn chance
+            var iterations = 15;
+            do
+            {
+                pickedPrefab = WeightIndexToPrefab(GetRandomIndexRespectWeights());
+                iterations--;
+            }
+            while (iterations > 0 && PrefabIsWeapon(pickedPrefab, _currentWeapon));
 
             Instantiate(pickedPrefab, position, Quaternion.identity);
         }
@@ -105,7 +115,8 @@ namespace MyTonaTechExec.Systems
                 _weaponChangeWeight,
                 _rifleWeight,
                 _automaticRifleWeight,
-                _shotgunWeight
+                _shotgunWeight,
+                _rocketLauncherWeight
             };
 
             var ranges = new List<float>(new float[allWeights.Length]);
@@ -144,6 +155,7 @@ namespace MyTonaTechExec.Systems
                 5 => GetWeaponPrefab(PlayerWeapon.WeaponType.Rifle),
                 6 => GetWeaponPrefab(PlayerWeapon.WeaponType.AutomaticRifle),
                 7 => GetWeaponPrefab(PlayerWeapon.WeaponType.Shotgun),
+                8 => GetWeaponPrefab(PlayerWeapon.WeaponType.RocketLauncher),
                 _ => throw new ArgumentException($"Cannot map {weightIndex} weight index!")
             };
         }
@@ -155,6 +167,7 @@ namespace MyTonaTechExec.Systems
                 PlayerWeapon.WeaponType.Rifle => _riflePrefab.gameObject,
                 PlayerWeapon.WeaponType.Shotgun => _automaticRifleWPrefab.gameObject,
                 PlayerWeapon.WeaponType.AutomaticRifle => _shotgunPrefab.gameObject,
+                PlayerWeapon.WeaponType.RocketLauncher => _rocketLauncherPrefab.gameObject,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
@@ -166,13 +179,14 @@ namespace MyTonaTechExec.Systems
                 PlayerWeapon.WeaponType.Rifle => prefab.Equals(_riflePrefab.gameObject),
                 PlayerWeapon.WeaponType.Shotgun => prefab.Equals(_shotgunPrefab.gameObject),
                 PlayerWeapon.WeaponType.AutomaticRifle => prefab.Equals(_automaticRifleWPrefab.gameObject),
+                PlayerWeapon.WeaponType.RocketLauncher => prefab.Equals(_rocketLauncherPrefab.gameObject),
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
 
         private GameObject GetRandomWeapon()
         {
-            return GetWeaponPrefab((PlayerWeapon.WeaponType)Random.Range(0, 3));
+            return GetWeaponPrefab((PlayerWeapon.WeaponType)Random.Range(0, 4));
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using MyTonaTechExec.Common;
 using MyTonaTechExec.EventBus.Messages;
 using MyTonaTechExec.PlayerUnit;
+using MyTonaTechExec.Projectiles;
 using UnityEngine;
 
 namespace MyTonaTechExec.Weapon

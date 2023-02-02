@@ -14,7 +14,8 @@ namespace MyTonaTechExec.Weapon
         {
             Rifle,
             Shotgun,
-            AutomaticRifle
+            AutomaticRifle,
+            RocketLauncher
         }
 
         protected virtual void Awake()
