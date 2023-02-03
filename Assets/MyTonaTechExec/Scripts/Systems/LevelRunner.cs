@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using MyTonaTechExec.Data;
 using MyTonaTechExec.EventBus;
@@ -47,7 +48,7 @@ namespace MyTonaTechExec.Systems
             StartCoroutine(Waves(level.WaveDatas, level.WaveInterval, level.Index));
             EventBus<FieldCreateMessage>.Pub(new FieldCreateMessage()
             {
-                Field = level.GetMap()
+                Field = GetMap(level.Map)
             });
         }
 
@@ -64,6 +65,22 @@ namespace MyTonaTechExec.Systems
         private void LoadLevelMessage(LoadLevelMessage message)
         {
             LoadLevel(message.LevelIndex);
+        }
+
+        private bool[,] GetMap(bool[] array)
+        {
+            var map = new bool[LevelData.FieldSize, LevelData.FieldSize];
+            
+            for (var i = 0; i < LevelData.FieldSize; i++)
+            {
+                for (var j = 0; j < LevelData.FieldSize; j++)
+                {
+                    var index = LevelData.FieldSize * i + j;
+                    map[i, j] = array[index];
+                }
+            }
+
+            return map;
         }
 
         private IEnumerator Waves(List<WaveData> waveDatas, float interval, int level)
