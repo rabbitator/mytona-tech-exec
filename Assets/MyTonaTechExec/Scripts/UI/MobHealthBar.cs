@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MyTonaTechExec.UI
 {
-    public class HealthBar : MonoBehaviour, IMobComponent
+    public class MobHealthBar : MonoBehaviour, IMobComponent
     {
         public GameObject Bar;
         public SpriteRenderer BarImg;
@@ -16,6 +16,8 @@ namespace MyTonaTechExec.UI
             var mob = GetComponent<Mob>();
             maxHP = mob.MaxHealth;
             mob.OnHpChange += OnHPChange;
+
+            OnHPChange(null, (mob.Health, 0));
         }
 
         public void OnDeath()

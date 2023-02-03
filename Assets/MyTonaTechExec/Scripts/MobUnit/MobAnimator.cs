@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace MyTonaTechExec.MobUnit
 {
@@ -6,6 +7,16 @@ namespace MyTonaTechExec.MobUnit
 	{
 		public Animator Animator;
 		public string AttackTrigger = "MeleeAttack";
+
+		private void Awake()
+		{
+			EventBus.EventBus.Sub(PlayerDeath, EventBus.EventBus.PLAYER_DEATH);
+		}
+
+		private void OnDestroy()
+		{
+			EventBus.EventBus.Unsub(PlayerDeath, EventBus.EventBus.PLAYER_DEATH);
+		}
 
 		public void StartAttackAnimation()
 		{
@@ -20,6 +31,11 @@ namespace MyTonaTechExec.MobUnit
 		public void OnDeath()
 		{
 			Animator.SetTrigger("Death");
+		}
+
+		private void PlayerDeath()
+		{
+			SetIsRun(false);
 		}
 	}
 }

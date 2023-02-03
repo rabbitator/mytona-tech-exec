@@ -16,6 +16,8 @@ namespace MyTonaTechExec.UI
         {
             player = GetComponent<Player>();
             player.OnHPChange += OnHPChange;
+
+            OnHPChange(null, (player.Health, 0));
         }
 
         public void OnDeath()
