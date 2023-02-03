@@ -2,13 +2,17 @@
 using MyTonaTechExec.EventBus.Messages;
 using MyTonaTechExec.PlayerUnit;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MyTonaTechExec.Weapon
 {
     public abstract class PlayerWeapon : MonoBehaviour
     {
         public abstract WeaponType Type { get; }
-        public GameObject Model;
+        
+        [FormerlySerializedAs("Model")]
+        [SerializeField]
+        private GameObject _model;
 
         public enum WeaponType
         {
@@ -36,7 +40,7 @@ namespace MyTonaTechExec.Weapon
                 EventBus<PlayerInputMessage>.Sub(Fire);
             }
 
-            Model.SetActive(type == Type);
+            _model.SetActive(type == Type);
         }
 
         protected abstract void Fire(PlayerInputMessage message);

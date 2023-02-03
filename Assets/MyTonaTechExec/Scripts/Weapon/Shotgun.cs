@@ -3,65 +3,76 @@ using MyTonaTechExec.EventBus.Messages;
 using MyTonaTechExec.PlayerUnit;
 using MyTonaTechExec.Projectiles;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MyTonaTechExec.Weapon
 {
-	public class Shotgun : PlayerWeapon
-	{
-		public override WeaponType Type => WeaponType.Shotgun;
-		public Projectile BulletPrefab;
-		public float Reload = 1f;
-		public Transform FirePoint;
-		public ParticleSystem VFX;
+    public class Shotgun : PlayerWeapon
+    {
+        public override WeaponType Type => WeaponType.Shotgun;
 
-		protected float lastTime;
+        [FormerlySerializedAs("BulletPrefab")]
+        [SerializeField]
+        private Projectile _bulletPrefab;
+        [FormerlySerializedAs("Reload")]
+        [SerializeField]
+        private float _reload = 1f;
+        [FormerlySerializedAs("FirePoint")]
+        [SerializeField]
+        private Transform _firePoint;
+        [FormerlySerializedAs("VFX")]
+        [SerializeField]
+        private ParticleSystem _vfx;
 
-		protected override void Awake()
-		{
-			base.Awake();
-			lastTime = Time.time - Reload;
-		}
+        private float _lastTime;
 
-		protected virtual float GetDamage()
-		{
-			return GetComponent<Player>().Damage;
-		}
+        protected override void Awake()
+        {
+            base.Awake();
+            _lastTime = Time.time - _reload;
+        }
 
-		protected override async void Fire(PlayerInputMessage message)
-		{
-			if (Time.time - Reload < lastTime)
-			{
-				return;
-			}
+        protected virtual float GetDamage()
+        {
+            return GetComponent<Player>().Damage;
+        }
 
-			if (!message.Fire)
-			{
-				return;
-			}
+        protected override async void Fire(PlayerInputMessage message)
+        {
+            if (Time.time - _reload < _lastTime)
+            {
+                return;
+            }
 
-			lastTime = Time.time;
-			GetComponent<PlayerAnimator>().TriggerShoot();
+            if (!message.Fire)
+            {
+                return;
+            }
 
-			await Task.Delay(16);
-			var directions = SpreadDirections(transform.rotation.eulerAngles, 3, 20);
-			foreach (var direction in directions)
-			{
-				var bullet = Instantiate(BulletPrefab, FirePoint.position, Quaternion.Euler(direction));
-				bullet.Damage = GetDamage();
-			
-			}
-			VFX.Play();
-		}
-	
-		public Vector3[] SpreadDirections(Vector3 direction, int num, int spreadAngle)
-		{
-			Vector3[] result = new Vector3[num];
-			result[0] = new Vector3(0,direction.y - (num-1) *spreadAngle/2,0);
-			for (int i = 1; i < num; i++)
-			{
-				result[i] = result[i - 1] + new Vector3(0,spreadAngle,0);
-			}
-			return result;
-		}
-	}
+            _lastTime = Time.time;
+            GetComponent<PlayerAnimator>().TriggerShoot();
+
+            await Task.Delay(16);
+            var directions = SpreadDirections(transform.rotation.eulerAngles, 3, 20);
+            foreach (var direction in directions)
+            {
+                var bullet = Instantiate(_bulletPrefab, _firePoint.position, Quaternion.Euler(direction));
+                bullet.Damage = GetDamage();
+            }
+
+            _vfx.Play();
+        }
+
+        private Vector3[] SpreadDirections(Vector3 direction, int num, int spreadAngle)
+        {
+            Vector3[] result = new Vector3[num];
+            result[0] = new Vector3(0, direction.y - (num - 1) * spreadAngle / 2, 0);
+            for (int i = 1; i < num; i++)
+            {
+                result[i] = result[i - 1] + new Vector3(0, spreadAngle, 0);
+            }
+
+            return result;
+        }
+    }
 }

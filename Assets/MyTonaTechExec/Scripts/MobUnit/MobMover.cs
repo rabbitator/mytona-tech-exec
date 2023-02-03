@@ -1,22 +1,35 @@
 ﻿using MyTonaTechExec.PlayerUnit;
 using MyTonaTechExec.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace MyTonaTechExec.MobUnit
 {
     public class MobMover : MonoBehaviour, IMobComponent
     {
-        public float SightDistance = 5f;
-        public float MoveSpeed;
-        public bool Active = true;
-    
-        private Vector3 targetPosition = Vector3.zero;
-        private MobAnimator mobAnimator;
+        [FormerlySerializedAs("SightDistance")]
+        [SerializeField]
+        private float _sightDistance = 5f;
+        [FormerlySerializedAs("MoveSpeed")]
+        [SerializeField]
+        private float _moveSpeed;
+        [FormerlySerializedAs("Active")]
+        [SerializeField]
+        private bool _active = true;
+
+        private Vector3 _targetPosition = Vector3.zero;
+        private MobAnimator _mobAnimator;
+
+        public bool Active
+        {
+            get => _active;
+            set => _active = value;
+        }
 
         private void Awake()
         {
-            mobAnimator = GetComponent<MobAnimator>();
+            _mobAnimator = GetComponent<MobAnimator>();
             PickRandomPosition();
             EventBus.EventBus.Sub(OnDeath, EventBus.EventBus.PLAYER_DEATH);
         }
@@ -28,31 +41,31 @@ namespace MyTonaTechExec.MobUnit
 
         private void Update()
         {
-            if (Active)
+            if (_active)
             {
                 var playerDistance = (transform.position - Player.Instance.transform.position).Flat().magnitude;
-                var targetDistance = (transform.position - targetPosition).Flat().magnitude;
-                if (SightDistance >= playerDistance)
+                var targetDistance = (transform.position - _targetPosition).Flat().magnitude;
+                if (_sightDistance >= playerDistance)
                 {
-                    targetPosition = Player.Instance.transform.position;
+                    _targetPosition = Player.Instance.transform.position;
                 }
                 else if (targetDistance < 0.2f)
                 {
                     PickRandomPosition();
                 }
 
-                var direction = (targetPosition - transform.position).Flat().normalized;
+                var direction = (_targetPosition - transform.position).Flat().normalized;
 
-                transform.SetPositionAndRotation(transform.position + direction * (Time.deltaTime * MoveSpeed), Quaternion.LookRotation(direction, Vector3.up));
+                transform.SetPositionAndRotation(transform.position + direction * (Time.deltaTime * _moveSpeed), Quaternion.LookRotation(direction, Vector3.up));
             }
 
-            mobAnimator.SetIsRun(Active);
+            _mobAnimator.SetIsRun(_active);
         }
 
         private void PickRandomPosition()
         {
-            targetPosition.x = Random.value * 11 - 6;
-            targetPosition.z = Random.value * 11 - 6;
+            _targetPosition.x = Random.value * 11 - 6;
+            _targetPosition.z = Random.value * 11 - 6;
         }
 
         public void OnDeath()

@@ -3,44 +3,54 @@ using MyTonaTechExec.EventBus.Messages;
 using MyTonaTechExec.PlayerUnit;
 using MyTonaTechExec.Projectiles;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MyTonaTechExec.Weapon
 {
-	public class RocketLauncher : PlayerWeapon
-	{
-		public override WeaponType Type => WeaponType.RocketLauncher;
-		public Projectile BulletPrefab;
-		public float Reload = 1f;
-		public Transform FirePoint;
-		public ParticleSystem VFX;
+    public class RocketLauncher : PlayerWeapon
+    {
+        public override WeaponType Type => WeaponType.RocketLauncher;
 
-		protected float lastTime;
+        [FormerlySerializedAs("BulletPrefab")]
+        [SerializeField]
+        public Projectile _bulletPrefab;
+        [FormerlySerializedAs("Reload")]
+        [SerializeField]
+        public float _reload = 1f;
+        [FormerlySerializedAs("FirePoint")]
+        [SerializeField]
+        public Transform _firePoint;
+        [FormerlySerializedAs("VFX")]
+        [SerializeField]
+        public ParticleSystem _vfx;
 
-		protected override void Awake()
-		{
-			base.Awake();
-			lastTime = Time.time - Reload;
-		}
+        private float _lastTime;
 
-		protected override async void Fire(PlayerInputMessage message)
-		{
-			if (Time.time - Reload < lastTime)
-			{
-				return;
-			}
+        protected override void Awake()
+        {
+            base.Awake();
+            _lastTime = Time.time - _reload;
+        }
 
-			if (!message.Fire)
-			{
-				return;
-			}
+        protected override async void Fire(PlayerInputMessage message)
+        {
+            if (Time.time - _reload < _lastTime)
+            {
+                return;
+            }
 
-			lastTime = Time.time;
-			GetComponent<PlayerAnimator>().TriggerShoot();
+            if (!message.Fire)
+            {
+                return;
+            }
 
-			await Task.Delay(16);
+            _lastTime = Time.time;
+            GetComponent<PlayerAnimator>().TriggerShoot();
 
-			var bullet = Instantiate(BulletPrefab, FirePoint.position, transform.rotation);
-			VFX.Play();
-		}
-	}
+            await Task.Delay(16);
+
+            Instantiate(_bulletPrefab, _firePoint.position, transform.rotation);
+            _vfx.Play();
+        }
+    }
 }

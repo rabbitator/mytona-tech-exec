@@ -4,51 +4,61 @@ using MyTonaTechExec.EventBus.Messages;
 using MyTonaTechExec.PlayerUnit;
 using MyTonaTechExec.Projectiles;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MyTonaTechExec.Weapon
 {
-	public class Rifle : PlayerWeapon
-	{
-		public override WeaponType Type => WeaponType.Rifle;
-		public Projectile BulletPrefab;
-		public float Reload = 1f;
-		public Transform FirePoint;
-		public ParticleSystem VFX;
+    public class Rifle : PlayerWeapon
+    {
+        public override WeaponType Type => WeaponType.Rifle;
 
-		protected float lastTime;
+        [FormerlySerializedAs("BulletPrefab")]
+        [SerializeField]
+        public Projectile _bulletPrefab;
+        [FormerlySerializedAs("Reload")]
+        [SerializeField]
+        public float _reload = 1f;
+        [FormerlySerializedAs("FirePoint")]
+        [SerializeField]
+        public Transform _firePoint;
+        [FormerlySerializedAs("VFX")]
+        [SerializeField]
+        public ParticleSystem _vfx;
 
-		protected override void Awake()
-		{
-			base.Awake();
-			EventBus<PlayerInputMessage>.Sub(Fire);
-			lastTime = Time.time - Reload;
-		}
+        private float _lastTime;
 
-		protected virtual float GetDamage()
-		{
-			return GetComponent<Player>().Damage;
-		}
+        protected override void Awake()
+        {
+            base.Awake();
+            EventBus<PlayerInputMessage>.Sub(Fire);
+            _lastTime = Time.time - _reload;
+        }
 
-		protected override async void Fire(PlayerInputMessage message)
-		{
-			if (Time.time - Reload < lastTime)
-			{
-				return;
-			}
+        protected virtual float GetDamage()
+        {
+            return GetComponent<Player>().Damage;
+        }
 
-			if (!message.Fire)
-			{
-				return;
-			}
+        protected override async void Fire(PlayerInputMessage message)
+        {
+            if (Time.time - _reload < _lastTime)
+            {
+                return;
+            }
 
-			lastTime = Time.time;
-			GetComponent<PlayerAnimator>().TriggerShoot();
+            if (!message.Fire)
+            {
+                return;
+            }
 
-			await Task.Delay(16);
+            _lastTime = Time.time;
+            GetComponent<PlayerAnimator>().TriggerShoot();
 
-			var bullet = Instantiate(BulletPrefab, FirePoint.position, transform.rotation);
-			bullet.Damage = GetDamage();
-			VFX.Play();
-		}
-	}
+            await Task.Delay(16);
+
+            var bullet = Instantiate(_bulletPrefab, _firePoint.position, transform.rotation);
+            bullet.Damage = GetDamage();
+            _vfx.Play();
+        }
+    }
 }

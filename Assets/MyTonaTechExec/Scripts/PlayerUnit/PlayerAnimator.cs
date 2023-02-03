@@ -1,13 +1,19 @@
 ﻿using MyTonaTechExec.EventBus;
 using MyTonaTechExec.EventBus.Messages;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MyTonaTechExec.PlayerUnit
 {
     public class PlayerAnimator : MonoBehaviour
     {
+        [FormerlySerializedAs("animator")]
         [SerializeField]
-        private Animator animator;
+        private Animator _animator;
+
+        private static readonly int AnimatorHashIsRun = Animator.StringToHash("IsRun");
+        private static readonly int AnimatorHashDeath = Animator.StringToHash("Death");
+        private static readonly int AnimatorHashShoot = Animator.StringToHash("Shoot");
 
         private void Awake()
         {
@@ -23,17 +29,17 @@ namespace MyTonaTechExec.PlayerUnit
 
         private void PlayRun(PlayerInputMessage message)
         {
-            animator.SetBool("IsRun", message.MovementDirection.sqrMagnitude > 0);
+            _animator.SetBool(AnimatorHashIsRun, message.MovementDirection.sqrMagnitude > 0);
         }
 
         private void AnimateDeath()
         {
-            animator.SetTrigger("Death");
+            _animator.SetTrigger(AnimatorHashDeath);
         }
 
         public void TriggerShoot()
         {
-            animator.SetTrigger("Shoot");
+            _animator.SetTrigger(AnimatorHashShoot);
         }
     }
 }

@@ -14,19 +14,19 @@ namespace MyTonaTechExec.MobUnit
         {
             _ = base.Attack();
 
-            mobAnimator.StartAttackAnimation();
-            mover.Active = false;
+            _mobAnimator.StartAttackAnimation();
+            _mobMover.Active = false;
 
-            yield return new WaitForSeconds(AttackDelay);
+            yield return new WaitForSeconds(_attackDelay);
 
             var playerDistance = (transform.position - Player.Instance.transform.position).Flat().magnitude;
             if (playerDistance <= _damageDistance)
             {
-                Player.Instance.TakeDamage(mob.Damage);
+                Player.Instance.TakeDamage(_mob.Damage);
             }
 
-            mover.Active = true;
-            attacking = false;
+            _mobMover.Active = true;
+            _attacking = false;
             _attackCoroutine = null;
         }
     }

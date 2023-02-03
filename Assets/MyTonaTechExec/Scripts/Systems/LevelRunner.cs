@@ -5,13 +5,18 @@ using MyTonaTechExec.Data;
 using MyTonaTechExec.EventBus;
 using MyTonaTechExec.EventBus.Messages;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MyTonaTechExec.Systems
 {
     public class LevelRunner : MonoBehaviour
     {
-        public int MaxMobCount = 5;
-        public float SpawnInterval = 2f;
+        [FormerlySerializedAs("MaxMobCount")]
+        [SerializeField]
+        private int _maxMobCount = 5;
+        [FormerlySerializedAs("SpawnInterval")]
+        [SerializeField]
+        private float _spawnInterval = 2f;
 
         private List<LevelData> _levelDatas = null;
         private int _mobsCount = 0;
@@ -36,7 +41,7 @@ namespace MyTonaTechExec.Systems
             EventBus<LoadLevelMessage>.Unsub(LoadLevelMessage);
         }
 
-        public void LoadLevel(int index)
+        private void LoadLevel(int index)
         {
             var level = _levelDatas.Find(l => l.Index == index);
             if (level == null)
@@ -57,7 +62,7 @@ namespace MyTonaTechExec.Systems
             _mobsCount--;
         }
 
-        public void MobSpawned(SpawnMobMessage message)
+        private void MobSpawned(SpawnMobMessage message)
         {
             _mobsCount++;
         }
@@ -70,7 +75,7 @@ namespace MyTonaTechExec.Systems
         private bool[,] GetMap(bool[] array)
         {
             var map = new bool[LevelData.FieldSize, LevelData.FieldSize];
-            
+
             for (var i = 0; i < LevelData.FieldSize; i++)
             {
                 for (var j = 0; j < LevelData.FieldSize; j++)
@@ -91,9 +96,9 @@ namespace MyTonaTechExec.Systems
                 {
                     for (var i = 0; i < keyValue.y; i++)
                     {
-                        while (_mobsCount >= MaxMobCount)
+                        while (_mobsCount >= _maxMobCount)
                         {
-                            yield return new WaitForSeconds(SpawnInterval);
+                            yield return new WaitForSeconds(_spawnInterval);
                         }
 
                         EventBus<SpawnMobMessage>.Pub(new SpawnMobMessage()
@@ -101,7 +106,7 @@ namespace MyTonaTechExec.Systems
                             Type = keyValue.x
                         });
 
-                        yield return new WaitForSeconds(SpawnInterval);
+                        yield return new WaitForSeconds(_spawnInterval);
                     }
                 }
 

@@ -1,14 +1,22 @@
 using MyTonaTechExec.MobUnit;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MyTonaTechExec.UI
 {
     public class MobHealthBar : MonoBehaviour, IMobComponent
     {
-        public GameObject Bar;
-        public SpriteRenderer BarImg;
-        public TMP_Text Text;
+        [FormerlySerializedAs("Bar")]
+        [SerializeField]
+        private GameObject _bar;
+        [FormerlySerializedAs("BarImg")]
+        [SerializeField]
+        private SpriteRenderer _barImg;
+        [FormerlySerializedAs("Text")]
+        [SerializeField]
+        private TMP_Text _text;
+
         private float maxHP;
 
         private void Awake()
@@ -22,18 +30,18 @@ namespace MyTonaTechExec.UI
 
         public void OnDeath()
         {
-            Bar.SetActive(false);
+            _bar.SetActive(false);
         }
 
         private void OnHPChange(object _, (float health, float diff) args)
         {
             var (health, _) = args;
             var frac = health / maxHP;
-            Text.text = $"{health:####}/{maxHP:####}";
-            BarImg.size = new Vector2(frac, BarImg.size.y);
-            var pos = BarImg.transform.localPosition;
+            _text.text = $"{health:####}/{maxHP:####}";
+            _barImg.size = new Vector2(frac, _barImg.size.y);
+            var pos = _barImg.transform.localPosition;
             pos.x = -(1 - frac) / 2;
-            BarImg.transform.localPosition = pos;
+            _barImg.transform.localPosition = pos;
         }
     }
 }

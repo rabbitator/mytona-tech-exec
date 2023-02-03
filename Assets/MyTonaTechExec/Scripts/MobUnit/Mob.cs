@@ -2,15 +2,34 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MyTonaTechExec.MobUnit
 {
     public class Mob : MonoBehaviour
     {
-        public float Damage = 1;
-        public float MoveSpeed = 3.5f;
-        public float Health = 3;
-        public float MaxHealth = 3;
+        [FormerlySerializedAs("Damage")]
+        [SerializeField]
+        private float _damage = 1;
+        [FormerlySerializedAs("MoveSpeed")]
+        [SerializeField]
+        private float _moveSpeed = 3.5f;
+        [FormerlySerializedAs("Health")]
+        [SerializeField]
+        private float _health = 3;
+        [FormerlySerializedAs("MaxHealth")]
+        [SerializeField]
+        private float _maxHealth = 3;
+
+        private const float LayingDeadTime = 3.0f;
+        private const float DivingTime = 3.0f;
+        private const float DivingDepth = -2.0f;
+
+        private CancellationTokenSource _cts = new CancellationTokenSource();
+
+        public float Damage => _damage;
+        public float Health => _health;
+        public float MaxHealth => _maxHealth;
 
         private event EventHandler<(float, float)> _onHpChange;
         public event EventHandler<(float, float)> OnHpChange
@@ -18,12 +37,6 @@ namespace MyTonaTechExec.MobUnit
             add => _onHpChange += value;
             remove => _onHpChange -= value;
         }
-
-        private CancellationTokenSource _cts = new CancellationTokenSource();
-
-        private const float LayingDeadTime = 3.0f;
-        private const float DivingTime = 3.0f;
-        private const float DivingDepth = -2.0f;
 
         private void Awake()
         {
@@ -37,25 +50,25 @@ namespace MyTonaTechExec.MobUnit
 
         public void TakeDamage(float amount)
         {
-            if (Health <= 0) return;
+            if (_health <= 0) return;
 
-            Health -= amount;
-            _onHpChange?.Invoke(this, (Health, -amount));
+            _health -= amount;
+            _onHpChange?.Invoke(this, (_health, -amount));
 
-            if (Health <= 0) Death();
+            if (_health <= 0) Death();
         }
 
         public void Heal(float amount)
         {
-            if (Health <= 0)
+            if (_health <= 0)
                 return;
-            Health += amount;
-            if (Health > MaxHealth)
+            _health += amount;
+            if (_health > _maxHealth)
             {
-                Health = MaxHealth;
+                _health = _maxHealth;
             }
 
-            _onHpChange?.Invoke(this, (Health, amount));
+            _onHpChange?.Invoke(this, (_health, amount));
         }
 
         private async void Death()

@@ -3,13 +3,16 @@ using MyTonaTechExec.EventBus;
 using MyTonaTechExec.EventBus.Messages;
 using MyTonaTechExec.MobUnit;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace MyTonaTechExec.Systems
 {
     public class MobSpawner : Handler<SpawnMobMessage>
     {
-        public Mob[] Prefabs;
+        [FormerlySerializedAs("Prefabs")]
+        [SerializeField]
+        private Mob[] _prefabs;
 
         protected override void Awake()
         {
@@ -20,7 +23,7 @@ namespace MyTonaTechExec.Systems
         protected override void HandleMessage(SpawnMobMessage message)
         {
             var position = GetRandomPosition();
-            Instantiate(Prefabs[message.Type], position, Quaternion.identity);
+            Instantiate(_prefabs[message.Type], position, Quaternion.identity);
         }
 
         private static Vector3 GetRandomPosition()

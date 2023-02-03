@@ -1,25 +1,31 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MyTonaTechExec.EventBus.Handlers
 {
-	public class ActivateOnEvent : MonoBehaviour
-	{
-		public int EventId = 0;
-		public GameObject Button;
-		private void Awake()
-		{
-			global::MyTonaTechExec.EventBus.EventBus.Sub(HandleMessage,EventId);
-		}
+    public class ActivateOnEvent : MonoBehaviour
+    {
+        [FormerlySerializedAs("EventId")]
+        [SerializeField]
+        private int _eventId = 0;
+        [FormerlySerializedAs("Button")]
+        [SerializeField]
+        private GameObject _button;
 
-		private void OnDestroy()
-		{
-			global::MyTonaTechExec.EventBus.EventBus.Unsub(HandleMessage,EventId);
-		}
+        private void Awake()
+        {
+            EventBus.Sub(HandleMessage, _eventId);
+        }
+
+        private void OnDestroy()
+        {
+            EventBus.Unsub(HandleMessage, _eventId);
+        }
 
 
-		public void HandleMessage()
-		{
-			Button.SetActive(true);
-		}
-	}
+        public void HandleMessage()
+        {
+            _button.SetActive(true);
+        }
+    }
 }

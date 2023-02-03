@@ -1,25 +1,44 @@
 ﻿using MyTonaTechExec.MobUnit;
 using MyTonaTechExec.PlayerUnit;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MyTonaTechExec.Projectiles
 {
     [RequireComponent(typeof(Collider))]
     public class Projectile : MonoBehaviour
     {
-        public float Damage;
-        public float Speed = 8;
-        public bool DamagePlayer;
-        public bool DamageMob;
-        public float TimeToLive = 5f;
-        public GameObject _trailVFX;
-        public GameObject _impactVFX;
+        [FormerlySerializedAs("Damage")]
+        [SerializeField]
+        protected float _damage;
+        [FormerlySerializedAs("Speed")]
+        [SerializeField]
+        protected float _speed = 8;
+        [FormerlySerializedAs("DamagePlayer")]
+        [SerializeField]
+        protected bool _damagePlayer;
+        [FormerlySerializedAs("DamageMob")]
+        [SerializeField]
+        protected bool _damageMob;
+        [FormerlySerializedAs("TimeToLive")]
+        [SerializeField]
+        protected float _timeToLive = 5f;
+        [SerializeField]
+        private GameObject _trailVFX;
+        [SerializeField]
+        private GameObject _impactVFX;
 
         protected Collider _trigger;
-        protected bool destroyed;
+        protected bool _destroyed;
         private MeshRenderer _meshRenderer;
-        private float timer;
+        private float _timer;
         private bool _radiusIncreased;
+
+        public float Damage
+        {
+            get => _damage;
+            set => _damage = value;
+        }
 
         private void Awake()
         {
@@ -39,27 +58,27 @@ namespace MyTonaTechExec.Projectiles
 
         protected virtual void OnTriggerEnter(Collider other)
         {
-            if (destroyed)
+            if (_destroyed)
             {
                 return;
             }
 
-            var damagedPlayer = DamagePlayer && other.CompareTag("Player");
-            var damagedMob = DamageMob && other.CompareTag("Mob");
+            var damagedPlayer = _damagePlayer && other.CompareTag("Player");
+            var damagedMob = _damageMob && other.CompareTag("Mob");
 
             if (damagedPlayer)
             {
-                other.GetComponent<Player>().TakeDamage(Damage);
-                destroyed = true;
+                other.GetComponent<Player>().TakeDamage(_damage);
+                _destroyed = true;
             }
 
             if (damagedMob)
             {
-                other.GetComponent<Mob>().TakeDamage(Damage);
-                destroyed = true;
+                other.GetComponent<Mob>().TakeDamage(_damage);
+                _destroyed = true;
             }
 
-            if (destroyed)
+            if (_destroyed)
             {
                 ActivateImpactVisual();
             }
@@ -67,13 +86,13 @@ namespace MyTonaTechExec.Projectiles
 
         private void Update()
         {
-            if (!destroyed)
+            if (!_destroyed)
             {
-                transform.position += transform.forward * (Speed * Time.deltaTime);
+                transform.position += transform.forward * (_speed * Time.deltaTime);
             }
 
-            timer += Time.deltaTime;
-            if (timer > TimeToLive)
+            _timer += Time.deltaTime;
+            if (_timer > _timeToLive)
             {
                 Destroy(gameObject);
             }

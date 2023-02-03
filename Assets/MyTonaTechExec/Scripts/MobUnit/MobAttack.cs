@@ -3,6 +3,7 @@ using System.Collections;
 using MyTonaTechExec.PlayerUnit;
 using MyTonaTechExec.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MyTonaTechExec.MobUnit
 {
@@ -10,17 +11,20 @@ namespace MyTonaTechExec.MobUnit
     [RequireComponent(typeof(Mob))]
     public class MobAttack : MonoBehaviour, IMobComponent
     {
+        [FormerlySerializedAs("AttackDistance")]
         [SerializeField]
-        protected float AttackDistance = 5f;
+        protected float _attackDistance = 5f;
+        [FormerlySerializedAs("AttackDelay")]
         [SerializeField]
-        protected float AttackDelay = .5f;
+        protected float _attackDelay = .5f;
+        [FormerlySerializedAs("AttackCooldown")]
         [SerializeField]
-        protected float AttackCooldown = 2f;
+        protected float _attackCooldown = 2f;
 
-        protected MobMover mover;
-        protected Mob mob;
-        protected MobAnimator mobAnimator;
-        protected bool attacking;
+        protected MobMover _mobMover;
+        protected Mob _mob;
+        protected MobAnimator _mobAnimator;
+        protected bool _attacking;
         protected Coroutine _attackCoroutine;
 
         private event EventHandler _onAttack;
@@ -32,9 +36,9 @@ namespace MyTonaTechExec.MobUnit
 
         private void Awake()
         {
-            mob = GetComponent<Mob>();
-            mover = GetComponent<MobMover>();
-            mobAnimator = GetComponent<MobAnimator>();
+            _mob = GetComponent<Mob>();
+            _mobMover = GetComponent<MobMover>();
+            _mobAnimator = GetComponent<MobAnimator>();
             EventBus.EventBus.Sub(OnDeath, EventBus.EventBus.PLAYER_DEATH);
         }
 
@@ -45,12 +49,12 @@ namespace MyTonaTechExec.MobUnit
 
         private void Update()
         {
-            if (attacking) return;
+            if (_attacking) return;
 
             var distanceToPlayer = (transform.position - Player.Instance.transform.position).Flat().magnitude;
-            if (distanceToPlayer > AttackDistance) return;
+            if (distanceToPlayer > _attackDistance) return;
 
-            attacking = true;
+            _attacking = true;
             _attackCoroutine = StartCoroutine(Attack());
         }
 

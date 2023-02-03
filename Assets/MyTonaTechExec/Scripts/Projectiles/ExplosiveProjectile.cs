@@ -17,10 +17,10 @@ namespace MyTonaTechExec.Projectiles
 
         protected override void OnTriggerEnter(Collider other)
         {
-            if (!destroyed)
+            if (!_destroyed)
             {
                 IncreaseDamageRadius();
-                destroyed = true;
+                _destroyed = true;
             }
 
             _gatheredObjects.Add(other);
@@ -28,7 +28,7 @@ namespace MyTonaTechExec.Projectiles
 
         private void FixedUpdate()
         {
-            if (!destroyed) return;
+            if (!_destroyed) return;
 
             _physicsFramesCount++;
             if (_physicsFramesCount == WaitPhysicsFramesCount)
@@ -42,14 +42,14 @@ namespace MyTonaTechExec.Projectiles
             foreach (var gatheredObject in _gatheredObjects)
             {
                 var player = gatheredObject.GetComponent<Player>();
-                if (DamagePlayer && player != null)
+                if (_damagePlayer && player != null)
                 {
                     player.TakeDamage(Damage);
                     continue;
                 }
 
                 var mob = gatheredObject.GetComponent<Mob>();
-                if (DamageMob && mob != null)
+                if (_damageMob && mob != null)
                 {
                     mob.TakeDamage(Damage);
                 }

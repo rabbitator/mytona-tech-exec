@@ -1,47 +1,55 @@
 ﻿using MyTonaTechExec.PlayerUnit;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MyTonaTechExec.UI
 {
     public class PlayerHealthBar : MonoBehaviour
     {
-        public GameObject Bar;
-        public SpriteRenderer BarImg;
-        public TMP_Text Text;
-        private float maxHP;
-        private Player player;
+        [FormerlySerializedAs("Bar")]
+        [SerializeField]
+        private GameObject _bar;
+        [FormerlySerializedAs("BarImg")]
+        [SerializeField]
+        private SpriteRenderer _barImg;
+        [FormerlySerializedAs("Text")]
+        [SerializeField]
+        private TMP_Text _text;
+
+        private float _maxHp;
+        private Player _player;
 
         private void Awake()
         {
-            player = GetComponent<Player>();
-            player.OnHPChange += OnHPChange;
+            _player = GetComponent<Player>();
+            _player.OnHPChange += OnHPChange;
 
-            OnHPChange(null, (player.Health, 0));
+            OnHPChange(null, (_player.Health, 0));
         }
 
         public void OnDeath()
         {
-            Bar.SetActive(false);
+            _bar.SetActive(false);
         }
 
         private void LateUpdate()
         {
-            Bar.transform.rotation = Camera.main.transform.rotation;
+            _bar.transform.rotation = Camera.main.transform.rotation;
         }
 
         private void OnHPChange(object obj, (float health, float diff) args)
         {
             var (health, _) = args;
-            var frac = health / player.MaxHealth;
-            Text.text = $"{health:####}/{player.MaxHealth:####}";
-            BarImg.size = new Vector2(frac, BarImg.size.y);
-            var pos = BarImg.transform.localPosition;
+            var frac = health / _player.MaxHealth;
+            _text.text = $"{health:####}/{_player.MaxHealth:####}";
+            _barImg.size = new Vector2(frac, _barImg.size.y);
+            var pos = _barImg.transform.localPosition;
             pos.x = -(1 - frac) / 2;
-            BarImg.transform.localPosition = pos;
+            _barImg.transform.localPosition = pos;
             if (health <= 0)
             {
-                Bar.SetActive(false);
+                _bar.SetActive(false);
             }
         }
     }
