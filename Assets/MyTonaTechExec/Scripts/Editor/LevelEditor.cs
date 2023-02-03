@@ -7,34 +7,28 @@ namespace MyTonaTechExec.Scripts.Editor
     [CustomEditor(typeof(LevelData))]
     public class LevelEditor : UnityEditor.Editor
     {
-        private int rows;
-        private int columns;
-        private bool[] selectedButtons;
-        private Rect[] buttonRects;
         private LevelData data;
 
         private void OnEnable()
         {
             data = (LevelData)target;
-            rows = columns = LevelData.FieldSize;
-            selectedButtons = data.Map;
         }
 
         public override void OnInspectorGUI()
         {
             var width = EditorGUIUtility.currentViewWidth;
-            var buttonWidth = (int)(width / columns - 5);
+            var buttonWidth = (int)(width / LevelData.FieldSize - 5);
 
             GUILayout.BeginVertical();
 
-            for (var i = 0; i < columns; i++)
+            for (var i = 0; i < LevelData.FieldSize; i++)
             {
                 GUILayout.BeginHorizontal();
 
-                for (var j = 0; j < rows; j++)
+                for (var j = 0; j < LevelData.FieldSize; j++)
                 {
                     var index = LevelData.FieldSize * i + j;
-                    selectedButtons[index] = CustomToggle(selectedButtons[index], buttonWidth, buttonWidth);
+                    data.Map[index] = CustomToggle(data.Map[index], buttonWidth, buttonWidth);
                 }
 
                 GUILayout.EndHorizontal();
@@ -59,15 +53,14 @@ namespace MyTonaTechExec.Scripts.Editor
 
         private void SelectAll(bool condition)
         {
-            for (var i = 0; i < selectedButtons.Length; i++)
+            for (var i = 0; i < data.Map.Length; i++)
             {
-                selectedButtons[i] = condition;
+                data.Map[i] = condition;
             }
         }
 
         private void Save()
         {
-            data.Map = selectedButtons;
             EditorUtility.SetDirty(data);
         }
 

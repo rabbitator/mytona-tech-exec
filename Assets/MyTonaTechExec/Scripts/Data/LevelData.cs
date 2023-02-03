@@ -7,6 +7,7 @@ namespace MyTonaTechExec.Data
     public class LevelData : ScriptableObject
     {
         public int Index;
+        [HideInInspector]
         public bool[] Map = new bool[FieldSize * FieldSize];
         public List<WaveData> WaveDatas;
         public float WaveInterval = 5f;
